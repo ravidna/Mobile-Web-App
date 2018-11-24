@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Supermarket</title>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.3/angular.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.3/angular-route.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+</head>
+<body>
+    <div>
+        <div>
+            <nav class="navbar navbar-inverse" role="navigation" style="padding-left:130px;">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="/">How to<span class="sr-only">(current)</span></a></li>
+                    <li><a href="/static/order.html">Order</a></li>
+                    <li><a href="/static/inSale.html">On Sale!</a></li>
+                    <li><a href="/static/recommendedProducts.html">Package Deals</a></li>
+                    <li><a href="/static/checkout.html">Checkout</a></li>
+                    <li><a href="/static/membership_club.html">Membership Club</a></li>
+                    <li><a href="/static/branches.html">Branches</a></li>
+                    <li><a href="/static/jobs.html">Jobs</a></li>
+                    <li><a href="/static/contact.html">Contact Us</a></li>
+                    <li><a href="/static/register.html">Register</a></li>
+                    <li><a href="/static/login.html">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="jumbotron" style="padding-left: 5em"> <p>
+            <h1>Manual</h1>
+            <h2>A full explanation how to use the site. Have fun! 😀😀😀</h2> <br>
+
+            <h3>Order:</h3>
+            This page presents all products in the DB. You can easily choose quantity and add it to your cart. <br>
+            You can even try to order large quantity and see what will happen (hint: we check that the quantity you want
+            to buy is available in stock). <br>
+            NOTE: products can only be added to cart. To remove products from cart - please use <a href="#checkout">Checkout page</a>.
+            <h5>Endpoints:</h5>
+            <ul>
+                <li>
+                    <code>/api/products/</code> with <code>GET</code>: to get all products in <code>Products</code> table in DB.
+                </li>
+                <li>
+                    <code>/img/:productName/</code> with <code>GET</code>: to get a product image.
+                </li>
+                <li>
+                    <code>/api/stock/:productName/</code> with <code>GET</code>: to get the quantity left in stock, for the given product. Uses <code>Products</code> table in DB.
+                </li>
+                <li>
+                    <code>/api/order/addProduct/</code> with <code>PUT</code>: to <b>add</b> products to the cart (will not overwrite current cart). Your cart will be written to <code>Orders</code> table in DB.
+                </li>
+            </ul>
+
+            <h3>On Sale!:</h3>
+            Presents only products which is on sale. You can easily choose quantity and add it to your cart. <br>
+            You can even try to order large quantity and see what will happen (hint: we check that the quantity you want
+            to buy is available in stock). <br>
+            NOTE: products can only be added to cart. To remove products from cart - please use <a href="#checkout">Checkout page</a>.
+            <h5>Endpoints:</h5>
+            <ul>
+                <li>
+                    <code>/api/sale/</code> with <code>GET</code>: to get all products on sale. Uses <code>Products</code> table in DB.
+                </li>
+                <li>
+                    <code>/img/:productName/</code> with <code>GET</code>.
+                </li>
+                <li>
+                    <code>/api/stock/:productName/</code> with <code>GET</code>.
+                </li>
+                <li>
+                    <code>/api/order/addProduct/</code> with <code>PUT</code>.
+                </li>
+            </ul>
+
+            <h3>Package Deals:</h3>
+            Offers recommended packages of products to cook yourself a meal (breakfast, lunch and chef meal). <br>
+            You can easily choose a package and its ingredients will be added to your cart. <br>
+            The price of the package is being calculated by summing the ingredients' prices.
+            <h5>Endpoints:</h5>
+            <ul>
+                <li>
+                    <code>/api/price/:productName/</code> with <code>GET</code>: to get the price of a given product. We use it for each ingredient in each package.
+                </li>
+                <li>
+                    <code>/api/order/addProduct/</code> with <code>PUT</code>.
+                </li>
+            </ul>
+
+            <h3 id="checkout">Checkout:</h3>
+            Review your order, change quantities and even remove products from cart. <br>
+            Finally, you can click on "Checkout" to place your order.
+            <h5>Endpoints:</h5>
+            <ul>
+                <li>
+                    <code>/api/order/</code> with <code>GET</code>: to get user's current cart. Uses <code>Orders</code> table in DB.
+                </li>
+                <li>
+                    <code>/api/order/setOrder</code> with <code>PUT</code>: to overwrite cart/order with a new order. Uses <code>Orders</code> table in DB.
+                </li>
+                <li>
+                    <code>/img/:productName/</code> with <code>GET</code>.
+                </li>
+                <li>
+                    <code>/api/price/:productName/</code> with <code>GET</code>.
+                </li>
+                <li>
+                    <code>/api/stock/:productName/</code> with <code>GET</code>.
+                </li>
+            </ul>
+
+            <h3>Membership Club:</h3>
+            Join our VIP club by filling a form. <br>
+            We invested in an attractive UX to better market our special offers.
+            <h5>Endpoints:</h5>
+            <ul>
+                <li>
+                    <code>/api/vip/</code> with <code>PUT</code>: to add user's information from the form. Uses <code>Users</code> table in DB.
+                </li>
+            </ul>
+
+
+            <h3>Branches:</h3>
+            Locations, opening hours and phone number. <br>
+            <h5>No Endpoints.</h5>
+
+
+            <h3>Jobs:</h3>
+            We're hiring! Checkout our open jobs. <br>
+            <h5>Endpoints:</h5>
+            <ul>
+                <li>
+                    <code>/api/jobs/</code> with <code>GET</code>: to get all jobs from <code>Jobs</code> table in DB.
+                </li>
+            </ul>
+
+            <h3>Contact Us:</h3>
+            Send a message to customer service. <br>
+            <h5>No Endpoints.</h5>
+
+
+            <h3>Register:</h3>
+            Register a new user. <br>
+            <h5>Endpoints:</h5>
+            <ul>
+                <li>
+                    <code>/users/register/</code> with <code>POST</code>: to register a new user. Verify given JSON and return a cookie for 30min. Use <code>Users</code> table in DB.
+                </li>
+            </ul>
+            If you prefers Postman's GUI over ours, you can send a registration JSON to <code>/users/register</code> endpoint. Should be in the next format: <code>{name: , user: , pass: }</code>. <br>
+            You must use a unique username! In case of successful registration you will get "0" in response, and a cookie 🍪. Otherwise you gonna get "1". <br>
+            <img src="/static/screenshots/register_request.png" style="height: 10%; width: 70%; object-fit: contain"> <br> <br>
+
+            <h3>Login:</h3>
+            Login with exist user. <br>
+            <h5>Endpoints:</h5>
+            <ul>
+                <li>
+                    <code>/users/login/</code> with <code>POST</code>: to login with exist user. Verify given JSON and return a cookie for 30min. Use <code>Users</code> table in DB.
+                </li>
+            </ul>
+            If you prefers Postman's GUI over ours, you can send a login JSON to <code>/users/login</code>.
+            For example - successful login: <br>
+            <img src="/static/screenshots/successful_login_request.png" style="height: 10%; width: 70%; object-fit: contain"> <br>
+
+            <h3>Switch users:</h3>
+            Just login with the wanted user.
+
+
+            <h3>Data Management:</h3>
+            Available <b><u>only</u></b> for the user with the username <code>admin</code>.
+            <h4>Read Table:</h4>
+            Read each one of the DB tables:
+            <ul>
+                <li>Users</li>
+                <li>Products</li>
+                <li>Orders</li>
+                <li>Jobs</li>
+            </ul>
+            by sending <code>GET</code> request to <code>/data/persist/:tableName</code>.
+            <h4>Delete Table:</h4>
+            Delete each one of the DB tables. It will empty the table 💔. <br>
+            By sending <code>GET</code> request to <code>/data/clean/:tableName</code>.
+
+        </p></div>
+    </div>
+</body>
+</html>

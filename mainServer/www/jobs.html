@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <title>Supermarket</title>
+        <!--//vue-table dependencies (vue and vue-resource)-->
+        <script src="https://cdn.jsdelivr.net/vue/1.0.28/vue.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.3.4/vue-resource.common.js"></script>
+        <script type="text/javascript" src="http://cdn.jsdelivr.net/vue.table/1.5.3/vue-table.min.js"></script>
+
+        <!--jquery-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <div>
+                <nav class="navbar navbar-inverse" role="navigation" style="padding-left:130px;">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/static/index.html">How to</a></li>
+                        <li><a href="/static/order.html">Order</a></li>
+                        <li><a href="/static/inSale.html">On Sale!</a></li>
+                        <li><a href="/static/recommendedProducts.html">Package Deals</a></li>
+                        <li><a href="/static/checkout.html">Checkout</a></li>
+                        <li><a href="/static/membership_club.html">Membership Club</a></li>
+                        <li><a href="/static/branches.html">Branches</a></li>
+                        <li class="active"><a href="/static/jobs.html">Jobs<span class="sr-only">(current)</span></a></li>
+                        <li><a href="/static/contact.html">Contact Us</a></li>
+                        <li><a href="/static/register.html">Register</a></li>
+                        <li><a href="/static/login.html">Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="jumbotron" style="padding-left: 5em">
+            <img src="jobs.jpg" alt="jobsimage" style="display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+            height: 50%" margin-left="auto" margin-right="auto">
+        </div>
+        <div id="app" class="ui vertical stripe segment">
+            <div class="ui container">
+                <div id="content" class="ui basic segment">
+                    <h3 class="ui header">Open Jobs</h3>
+                    <vuetable
+                            api-url="http://localhost:80/api/jobs"
+                            table-wrapper="#content"
+                            :fields="columns"
+                            data-path=""
+                            pagination-path=""
+                    ></vuetable>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                columns: [
+                    'title',
+                    'description',
+                    'date',
+                ],
+            },
+            methods: {
+                viewProfile: function(id) {
+                    console.log('view profile with id:', id)
+                }
+            },
+            events: {
+                'vuetable:action': function(action, data) {
+                    console.log('vuetable:action', action, data)
+                    if (action == 'view-item') {
+                        this.viewProfile(data.id)
+                    }
+                },
+                'vuetable:load-error': function(response) {
+                    console.log('Load Error: ', response)
+                }
+            }
+        });
+
+
+        // There's no need in pagination
+        $('.vuetable-pagination-info').hide();
+    </script>
+</html>

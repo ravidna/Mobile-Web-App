@@ -1,0 +1,259 @@
+<html>
+<head>
+    <title>Supermarket</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <link rel='stylesheet prefetch' href='https://codepen.io/justinklemm/pen/zAdoJ.css'>
+</head>
+<body>
+<div>
+    <div>
+        <nav class="navbar navbar-inverse" role="navigation" style="padding-left:130px;">
+            <ul class="nav navbar-nav">
+                <li><a href="/static/index.html">How to</a></li>
+                <li><a href="/static/order.html">Order</a></li>
+                <li><a href="/static/inSale.html">On Sale!</a></li>
+                <li><a href="/static/recommendedProducts.html">Package Deals</a></li>
+                <li class="active"><a href="/static/checkout.html">Checkout<span class="sr-only">(current)</span></a></li>
+                <li><a href="/static/membership_club.html">Membership Club</a></li>
+                <li><a href="/static/branches.html">Branches</a></li>
+                <li><a href="/static/jobs.html">Jobs</a></li>
+                <li><a href="/static/contact.html">Contact Us</a></li>
+                <li><a href="/static/register.html">Register</a></li>
+                <li><a href="/static/login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+<h1>Your Cart</h1>
+<div class="shopping-cart">
+
+    <div class="column-labels">
+        <label class="product-image">Image</label>
+        <label class="product-details">Product</label>
+        <label class="product-price">Price</label>
+        <label class="product-quantity">Quantity</label>
+        <label class="product-removal">Remove</label>
+        <label class="product-line-price">Total</label>
+    </div>
+
+    <p id="products"></p>
+    <div class="totals">
+        <div class="totals-item">
+            <label>Subtotal</label>
+            <div class="totals-value" id="cart-subtotal">0.00</div>
+        </div>
+        <div class="totals-item">
+            <label>Tax (5%)</label>
+            <div class="totals-value" id="cart-tax">0.00</div>
+        </div>
+        <div class="totals-item">
+            <label>Shipping</label>
+            <div class="totals-value" id="cart-shipping">0.00</div>
+        </div>
+        <div class="totals-item totals-item-total">
+            <label>Grand Total</label>
+            <div class="totals-value" id="cart-total">0.00</div>
+        </div>
+    </div>
+
+    <button class="checkout">Checkout</button>
+
+</div>
+</body>
+<script>
+    /* Set rates + misc */
+    let taxRate = 0.05;
+    let shippingRate = 15.00;
+    let fadeTime = 300;
+
+
+    /* Recalculate cart */
+    function recalculateCart()
+    {
+        let subtotal = 0;
+
+        /* Sum up row totals */
+        $('.product').each(function () {
+            subtotal += parseFloat($(this).children('.product-line-price').text());
+        });
+
+        /* Calculate totals */
+        let tax = subtotal * taxRate;
+        let shipping = (subtotal > 0 ? shippingRate : 0);
+        let total = subtotal + tax + shipping;
+
+        /* Update totals display */
+        $('.totals-value').fadeOut(fadeTime, function() {
+            $('#cart-subtotal').html(subtotal.toFixed(2));
+            $('#cart-tax').html(tax.toFixed(2));
+            $('#cart-shipping').html(shipping.toFixed(2));
+            $('#cart-total').html(total.toFixed(2));
+            $('.totals-value').fadeIn(fadeTime);
+        });
+    }
+
+
+    /* Update quantity */
+    function updateQuantity(quantityInput)
+    {
+        /* Calculate line price */
+        let productRow = $(quantityInput).parent().parent();
+        let price = parseFloat(productRow.children('.product-price').text());
+        let quantity = parseFloat($(quantityInput).val());
+        let linePrice = (price * quantity).toFixed(2);
+
+        /* Update line price display and recalc cart totals */
+        productRow.children('.product-line-price').each(function () {
+            $(this).fadeOut(fadeTime, function() {
+                $(this).text(linePrice);
+                recalculateCart();
+                $(this).fadeIn(fadeTime);
+            });
+        });
+    }
+
+
+    /* Remove item from cart */
+    function removeItem(removeButton)
+    {
+        /* Remove row from DOM and recalc cart total */
+        let productRow = $(removeButton).parent().parent();
+        productRow.slideUp(fadeTime, function() {
+            productRow.remove();
+            recalculateCart();
+        });
+    }
+
+    async function isInStock(productName, quantity) {
+        let url = 'http://localhost:80/api/stock/' + productName;
+        let inStock = await fetch(url, {credentials: "include",
+            headers: {"Content-Type": "application/json; charset=utf-8"}})
+            .then(response => response.json())
+            .then(quantity => parseInt(quantity));
+        return quantity < inStock;
+    }
+
+    function sendOrder(checkoutButton)
+    {
+        let order = {};
+        /* Sum up row totals */
+        $('.product').each(async function () {
+            let name = $(this).children('.product-details').children('.product-title').text();
+            let quantity = $(this).children('.product-quantity').children(':input[type="number"]').val();
+            order[name] = parseInt(quantity);
+            let productIsInStock = await isInStock(name, quantity);
+            if (productIsInStock === false) {
+                let notInStockMsg = "The " + name + " quantity you chose is bigger than the stock we have " +
+                    "right now.\n" +
+                    "We got your order regularly, but it might cost you more... We'll contact you for more " +
+                    "information about buying large quantities.";
+                alert(notInStockMsg);
+            }
+        });
+        putRequest('http://localhost:80/api/order/setOrder', order);
+        let orderMsg = "You placed an order successfully!";
+        alert(orderMsg);
+    }
+
+    function putRequest(url = ``, data = {}) {
+        return fetch(url, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json; charset=utf-8",
+            },
+            body: JSON.stringify(data),
+        })
+    }
+
+    function createProduct(name,price,quantity, stock){
+        let imgEndpointUrl = "http://localhost:80/img/" + name + ".jpg";
+        let imgTag = '<img src="' + imgEndpointUrl + '">';
+        let titleTag = '<div class="product-title">' + name + '</div>';
+        let descriptionMsg = 'The best kind of ' + name + ' from top ranked brand. We love it!';
+        let descriptionTag = '<p class="product-description">' + descriptionMsg + '</p>';
+        let priceTag = '<div class="product-price">' + price + '</div>';
+        let quantityTag = '<input type="number" value="' + quantity + '" min="1" max="' + stock + '">';
+        let linePrice = (quantity * price).toFixed(2);
+        let linePriceTag = '<div class="product-line-price">' + linePrice + '</div>';
+        return [
+            '<div class="product">',
+            '<div class="product-image">',
+            imgTag,
+            '</div>',
+            '<div class="product-details">',
+            titleTag,
+            descriptionTag,
+            '</div>',
+            priceTag,
+            '<div class="product-quantity">',
+            quantityTag,
+            '</div>',
+            '<div class="product-removal">',
+            '<button class="remove-product">',
+            'Remove',
+            '</button>',
+            '</div>',
+            linePriceTag,
+            '</div>',
+        ].join('\n');
+    }
+
+    function getProductPrice(productName) {
+        let url = "http://localhost:80/api/price/" + productName;
+        return fetch(url, {method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json; charset=utf-8",
+            }
+        })
+            .then(response => response.json())
+            .then(price => parseFloat(price));
+    }
+
+    function getProductStock(productName) {
+        let url = "http://localhost:80/api/stock/" + productName;
+        return fetch(url, {
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json; charset=utf-8",
+            }
+        })
+            .then(response => response.json())
+            .then(stock => parseInt(stock));
+    }
+
+    fetch("/api/order")
+        .then(response => response.text())
+        .then(async function(text) {
+            let productsList = JSON.parse(text);
+            for (let productName in productsList) {
+                let productPrice = await getProductPrice(productName);
+                let productStock = await getProductStock(productName);
+                let quantity = productsList[productName];
+                let html = createProduct(productName, productPrice, quantity, productStock);
+                $("#products").append(html);
+                recalculateCart();
+            }
+        })
+        .then(() => assignActions());
+
+    /* Assign actions */
+    function assignActions() {
+        $('.product-quantity input').change( function() {
+            updateQuantity(this);
+        });
+
+        $('.product-removal button').click( function() {
+            removeItem(this);
+        });
+
+        $('.checkout').click( function() {
+            sendOrder(this);
+        });
+    }
+</script>
+</html>

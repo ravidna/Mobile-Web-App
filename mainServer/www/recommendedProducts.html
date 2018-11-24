@@ -1,0 +1,147 @@
+<html>
+<head>
+    <title>Supermarket</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div>
+    <div>
+        <nav class="navbar navbar-inverse" role="navigation" style="padding-left:130px;">
+            <ul class="nav navbar-nav">
+                <li><a href="/static/index.html">How to</a></li>
+                <li><a href="/static/order.html">Order</a></li>
+                <li><a href="/static/inSale.html">On Sale!</a></li>
+                <li class="active"><a href="/static/recommendedProducts.html">Package Deals<span class="sr-only">(current)</span></a></li>
+                <li><a href="/static/checkout.html">Checkout</a></li>
+                <li><a href="/static/membership_club.html">Membership Club</a></li>
+                <li><a href="/static/branches.html">Branches</a></li>
+                <li><a href="/static/jobs.html">Jobs</a></li>
+                <li><a href="/static/contact.html">Contact Us</a></li>
+                <li><a href="/static/register.html">Register</a></li>
+                <li><a href="/static/login.html">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+
+        <p>
+            <center><img src="recommended.jpg" alt="recommended" style="width:200px;height:200x;" margin-left="auto" margin-right="auto"></center>
+        </div>
+
+        <br>
+             <table class="table table-hover table-dark">
+  <thead>
+    <tr>
+      <th scope="col" class="text-center">Breakfast Package</th>
+      <th scope="col" class="text-center">Lunch Package</th>
+      <th scope="col" class="text-center">Chef Meal Package</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><center><img src="MilkHoney.jpg" alt="MilkHoney" style="width:300px;height:auto;"></center></td>
+      <td><center><img src="special.jpg" alt="special" style="width:300px;height:auto;"></center></td>
+      <td><center><img src="full.jpg" alt="full" style="width:300px;height:auto;"></td>
+    </tr>
+    <tr>
+      <td class="text-center">Milk, Honey, 2 Eggs</td>
+      <td class="text-center">Parsley, 3 Chickens, 5 Tomatos, Onion, Lemon,<br> 2 Peppers, 2 Cheeses</td>
+      <td class="text-center">3 Breads, 3 Beef, 4 Mushrooms, 8 Cheeses, Broccoli,<br> Spinach, Tariaki sauce, Pepper</td>
+    </tr>
+    <tr>
+        <td class="text-center">
+            <div class="price" data-for="breakfast">calculating...</div>
+        </td>
+        <td class="text-center">
+            <div class="price" data-for="specialMeal">calculating...</div>
+        </td>
+        <td class="text-center">
+            <div class="price" data-for="fullMeal">calculating...</div>
+        </td>
+    </tr>
+    <tr>
+      <td class="text-center">
+          <button type="button" class="btn btn-primary"
+                  onclick="addProducts(mealPackages['breakfast'])">
+              Add to Cart
+          </button>
+      </td>
+      <td class="text-center">
+          <button type="button" class="btn btn-primary"
+                  onclick="addProducts(mealPackages['specialMeal'])">
+              Add to Cart
+          </button>
+      </td>
+      <td class="text-center">
+          <button type="button" class="btn btn-primary"
+                  onclick="addProducts(mealPackages['fullMeal'])">
+              Add to Cart
+          </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+<script>
+    function addProducts(order) {
+        putRequest('http://localhost:80/api/order/addProduct/', order);
+        let orderMsg = "Products added to your cart successfully!";
+        alert(orderMsg);
+    }
+
+
+    function putRequest(url = ``, data = {}) {
+        return fetch(url, {
+            method: "PUT",
+            credentials: "include",
+            headers: {"Content-Type": "application/json; charset=utf-8",},
+            body: JSON.stringify(data),
+        });
+    }
+
+
+    let mealPackages = {
+        'breakfast': {'Milk': 1, 'Honey': 1, 'Eggs': 2},
+        'specialMeal': {
+            'Parsley': 1, 'Chicken': 3, 'Tomato': 5, 'Onion': 1, 'Lemon': 1,
+            'Pepper': 2, 'Cheese': 2
+        },
+        'fullMeal': {
+            'Bread': 3, 'Beef': 3, 'Mushrooms': 4, 'Cheese': 8,
+            'Broccoli': 1, 'Spinach': 1, 'Tariaki sauce': 1, 'Pepper': 1
+        }
+    };
+
+    function getProductPrice(productName) {
+        let url = "http://localhost:80/api/price/" + productName;
+        return fetch(url, {method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json; charset=utf-8",
+            }
+        })
+            .then(response => response.json())
+            .then(price => parseFloat(price));
+    }
+
+    $('.price').each(async function () {
+        let packName = this.getAttribute("data-for");
+        let pack = mealPackages[packName];
+        let packPrice = 0;
+        for (let productName in pack) {
+            if (pack.hasOwnProperty(productName)) {
+                let productPrice = await getProductPrice(productName);
+                // alert(productName + ": " + productPrice);
+                packPrice += productPrice;
+            }
+        }
+        let priceText = packPrice.toFixed(2) + "$";
+        $(this).html(priceText);
+        // $(this).text("<b>Hello world!</b>");
+    });
+
+    // alert(getProductPrice('Chicken'));
+
+</script>
+</html>
