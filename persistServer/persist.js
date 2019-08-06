@@ -44,12 +44,6 @@ if (typeof localStorage === "undefined" || localStorage === null) {
 
 function getTable(tableName) {
     if (tableName !== undefined) {
-        // return JSON.parse(localStorage.getItem(tableName));
-        // console.log("[persist.js getTable] tableName: " + tableName);
-        // console.log("[persist.js getTable] localStorage.getItem(tableName): " + localStorage.getItem(tableName));
-        // return JSON.stringify(localStorage.getItem(tableName));
-        // console.log("[persist.js getTable] localStorage.getItem(tableName): " + localStorage.getItem(tableName));
-        // return JSON.localStorage.getItem(tableName);
         let table = localStorage.getItem(tableName);
         return JSON.parse(table);
     }
@@ -58,7 +52,6 @@ function getTable(tableName) {
 
 function setTable(table_name, value) {
     if (table_name !== undefined) {
-        // localStorage.setItem(table_name, value);
         console.log("[persist.js setTable] value: " + value);
         localStorage.setItem(table_name, JSON.stringify(value));
         return 0;
@@ -106,7 +99,6 @@ app.get("/img/:filename", (req, res) => {
 });
 
 // DB API
-// app.get('/getTable/:table_name', (req, res) => {
 app.get('/data/persist/:table_name', (req, res) => {
     let tableName = req.params.table_name;
     // console.log("getTable with tableName: " + tableName);
@@ -116,16 +108,8 @@ app.get('/data/persist/:table_name', (req, res) => {
     res.end(JSON.stringify(table_body));
 });
 
-// app.put('/setTable/:table_name', (req, res) => {
 app.put('/data/persist/:table_name', (req, res) => {
     let tableName = req.params.table_name;
-    // let table = getTable(tableName);
-    // console.log("[setTable endpoint] tableName: " + tableName);
-    // console.log("[setTable endpoint] req.body: " + req.body);
-    // Object.keys(req.body).forEach((key) => {
-    //     console.log("[setTable endpoint] key: " + key);
-    //     table[key] = req.body.key;
-    // });
     let new_table = req.body;
     let status = setTable(tableName, new_table);
     if (status === 0) {
@@ -143,144 +127,6 @@ app.get('/data/clean/:table_name', (req, res) => {
     }
     return res.end("1");
 });
-
-
-//
-// // Set index.html as root file
-// app.get("/",function(req,res){
-//     res.sendFile(path.join(static_path, '/index.html'));
-// });
-//
-//
-// // Ideas CRUD API
-// function getUserRecord(user) {
-//     if (user !== undefined) {
-//         return JSON.parse(localStorage.getItem(user));
-//     }
-//     return undefined;
-// }
-//
-//
-// app.get("/ideas",function(req,res){
-//     let user = req.cookies.user;
-//     console.log("Ideas API GET from user: " + user);
-//     if (user !== undefined) {
-//         let user_record = getUserRecord(user);
-//         if (user_record !== undefined) {
-//             let user_ideas = user_record['ideas'];
-//             res.end(JSON.stringify(user_ideas));
-//         }
-//     }
-//     res.end('{}');
-// });
-//
-//
-// app.put("/idea",function(req,res){
-//     let user = req.cookies.user;
-//     if (user !== undefined) {
-//         let user_record = getUserRecord(user);
-//         if (user_record !== undefined) {
-//             let user_ideas = user_record['ideas'];
-//             // Get new idea's ID
-//             let id = user_ideas.length;
-//             // Put new idea
-//             let idea = JSON.stringify(req.body);
-//             console.log("New idea: " + idea);
-//             user_ideas.push(idea);
-//             // Overwrite old record
-//             user_record['ideas'] = user_ideas;
-//             console.log("user_record: " + JSON.stringify(user_record));
-//             localStorage.setItem(user, JSON.stringify(user_record));
-//             // Send idea's ID as a result
-//             res.end(String(id));
-//         }
-//     }
-//     res.end(String(-1));
-// });
-//
-//
-// app.delete("/idea/:id",function(req,res) {
-//     let user = req.cookies.user;
-//     if (user !== undefined) {
-//         let user_record = getUserRecord(user);
-//         if (user_record !== undefined) {
-//             let user_ideas = user_record['ideas'];
-//             // Get wanted idea's ID
-//             let id = parseInt(req.params.id);
-//             console.log("Given ID to delete: " + id);
-//             // Check if ideas contains the given ID
-//             if (typeof(id) === "number") {
-//                 if ((id >= 0) && (id < user_ideas.length)) {
-//                     let isDeleted = delete user_ideas[id];
-//                     if (isDeleted === true) {
-//                         localStorage.setItem(user, JSON.stringify(user_record));
-//                         res.end("0");
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     res.end(String(1));
-// });
-//
-//
-// app.post("/idea/:id",function(req,res){
-//     // let idea = JSON.stringify(req.body);
-//     // let id = req.params.id;
-//     // console.log("Update id: " + id);
-//     // console.log("New idea: " + idea);
-//     // if ((id >= 0) && (id < ideas.length)) {
-//     //     ideas[id] = idea;
-//     //     res.end("0");
-//     // }
-//     // res.end("1");
-//
-//     let user = req.cookies.user;
-//     if (user !== undefined) {
-//         let user_record = getUserRecord(user);
-//         if (user_record !== undefined) {
-//             let user_ideas = user_record['ideas'];
-//             // Get wanted idea's ID
-//             let id = parseInt(req.params.id);
-//             console.log("Given ID to update: " + id);
-//             // Check if ideas contains the given ID
-//             if (typeof(id) === "number") {
-//                 if ((id >= 0) && (id < user_ideas.length)) {
-//                     let idea = JSON.stringify(req.body);
-//                     user_ideas[id] = idea;
-//                     localStorage.setItem(user, JSON.stringify(user_record));
-//                     res.end("0");
-//                 }
-//             }
-//         }
-//     }
-//     res.end(String(1));
-// });
-//
-//
-// // Place an order
-// app.put("/order",function(req,res) {
-//     let user = req.cookies.user;
-//     if (user !== undefined) {
-//         let user_record = getUserRecord(user);
-//         if (user_record !== undefined) {
-//             let user_ideas = user_record['ideas'];
-//             // Get new idea's ID
-//             let id = user_ideas.length;
-//             // Put new idea
-//             let idea = JSON.stringify(req.body);
-//             console.log("New idea: " + idea);
-//             user_ideas.push(idea);
-//             // Overwrite old record
-//             user_record['ideas'] = user_ideas;
-//             console.log("user_record: " + JSON.stringify(user_record));
-//             localStorage.setItem(user, JSON.stringify(user_record));
-//             // Send idea's ID as a result
-//             res.end(String(id));
-//         }
-//     }
-//     res.end(String(-1));
-// });
 
 
 // 404 Error
